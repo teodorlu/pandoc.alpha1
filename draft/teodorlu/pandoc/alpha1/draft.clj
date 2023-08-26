@@ -83,3 +83,9 @@
   (clerk/html (-> "# A _great_ heading"
                   pandoc/from-markdown
                   pandoc/to-html)))
+
+(clerk/table
+ (with-open [conn (next.jdbc/get-connection datasource)]
+    (next.jdbc/execute!
+     conn
+     ["SELECT * FROM pandoc_cache LIMIT 20"])))
