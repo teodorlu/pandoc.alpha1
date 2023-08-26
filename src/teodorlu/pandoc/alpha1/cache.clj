@@ -11,10 +11,6 @@
    [clojure.edn :as edn]
    [clojure.string :as str]))
 
-;; Provide a cache for low-level pandoc operations to speed things up
-;;
-;; Per 2023-08-26 not in use.
-
 (def ^:dynamic *pandoc-cache* nil)
 
 (defprotocol ICache
