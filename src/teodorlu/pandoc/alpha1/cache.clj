@@ -1,5 +1,5 @@
 (ns teodorlu.pandoc.alpha1.cache
-  "Plugin in your own pandoc cache to speed things up!
+  "Plug in in your own pandoc cache to speed things up!
 
   Bind teodorlu.pandoc.alpha1.cache/*pandoc-cache* to something that satisfies
   teodorlu.pandoc.alpha1.cache/ICache to avoid shelling out to Pandoc when
