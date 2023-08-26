@@ -1,4 +1,8 @@
-(ns teodorlu.pandoc.alpha1.cache)
+(ns teodorlu.pandoc.alpha1.cache
+  (:require
+   [babashka.fs :as fs]
+   [clojure.edn :as edn]
+   [clojure.string :as str]))
 
 ;; Provide a cache for low-level pandoc operations to speed things up
 ;;
@@ -22,7 +26,42 @@
         (swap! cache assoc key val)))))
 
 (comment
+  (fs/xdg-cache-home "teodorlu.pandoc.alpha1/cache.d"))
+
+(defn file-cache []
+  (let [hash-str (fn [s]
+                   (->
+                    (.encodeToString (java.util.Base64/getEncoder)
+                                     (.digest
+                                      (doto (java.security.MessageDigest/getInstance "SHA-256")
+                                        (.update (.getBytes s "UTF-8")))))
+                    (str/replace "/" "_")
+                    (str/replace "+" "-")))
+        cache-dir (fs/xdg-cache-home "teodorlu.pandoc.alpha1/cache.d")]
+    (fs/create-dirs cache-dir)
+    (reify ICache
+      (contains-key? [_ k]
+        (let [digest (hash-str k)
+              cache-file (fs/file cache-dir (str digest ".edn"))]
+          (fs/exists? cache-file)))
+      (lookup [_ k]
+        (let [digest (hash-str k)
+              cache-file (fs/file cache-dir (str digest ".edn"))]
+          (when (fs/exists? cache-file)
+            (edn/read-string (slurp cache-file)))))
+      (save [_ k v]
+        (let [digest (hash-str k)
+              cache-file (fs/file cache-dir (str digest ".edn"))]
+          (spit cache-file (pr-str v)))))))
+
+(comment
   (let [cache (in-memory-cache)]
     (save cache :key :value)
     (contains-key? cache :key)
     (lookup cache :key)))
+
+;; TODO
+;;
+;; JDBC cache
+;;
+;; Redis cache

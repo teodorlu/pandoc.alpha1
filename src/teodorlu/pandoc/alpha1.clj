@@ -20,7 +20,7 @@
       (:out process-handle))))
 
 (defn- run-pandoc [stdin command]
-  (if-let [cache  cache/*pandoc-cache*]
+  (if-let [cache cache/*pandoc-cache*]
     (let [k (pr-str (sorted-map :stdin stdin :command command))]
       (if (cache/contains-key? cache k)
         (cache/lookup cache k)
@@ -33,12 +33,29 @@
   (time
    (from-markdown "# A header"))
 
-  (def my-cache (cache/in-memory-cache))
+  (def in-mem-cache (cache/in-memory-cache))
 
-  (binding [cache/*pandoc-cache* my-cache]
+  (binding [cache/*pandoc-cache* in-mem-cache]
     (time
-     (from-markdown "# A header"))
-    ))
+     (from-markdown "# A header")))
+
+  (def file-cache (cache/file-cache))
+
+  (binding [cache/*pandoc-cache* file-cache]
+    (time
+     (from-markdown "# A header")))
+
+  (def some-cache-key "abc123")
+
+  (cache/contains-key? file-cache some-cache-key)
+  (cache/save file-cache some-cache-key "a solution!")
+  (cache/lookup file-cache some-cache-key)
+
+  (binding [cache/*pandoc-cache* file-cache]
+    (time
+     (from-markdown "# A header")))
+
+  )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; PANDOC IR HELPERS
