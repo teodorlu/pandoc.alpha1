@@ -13,7 +13,8 @@
 (defprotocol ICache
   (contains-key? [this key])
   (lookup [this key])
-  (save [this key val]))
+  (save [this key val])
+  (clear! [this]))
 
 (defn in-memory-cache []
   (let [cache (atom {})]
@@ -23,7 +24,9 @@
       (lookup [_ key]
         (get @cache key))
       (save [_ key val]
-        (swap! cache assoc key val)))))
+        (swap! cache assoc key val))
+      (clear! [_]
+        (reset! cache {})))))
 
 (comment
   (fs/xdg-cache-home "teodorlu.pandoc.alpha1/cache.d"))
@@ -52,7 +55,9 @@
       (save [_ k v]
         (let [digest (hash-str k)
               cache-file (fs/file cache-dir (str digest ".edn"))]
-          (spit cache-file (pr-str v)))))))
+          (spit cache-file (pr-str v))))
+      (clear! [_]
+        nil))))
 
 (comment
   (let [cache (in-memory-cache)]
