@@ -52,11 +52,34 @@
   (cache/save file-cache some-cache-key "a solution!")
   (cache/lookup file-cache some-cache-key)
 
-  (slurp (fs/expand-home "~/dev/iterate/mikrobloggeriet/o/olorm-1/index.md"))
+  (let [path (fs/expand-home "~/dev/iterate/mikrobloggeriet/o/olorm-1/index.md")]
+    (fs/exists? path))
+  (slurp (str (fs/expand-home "~/dev/iterate/mikrobloggeriet/o/olorm-1/index.md")))
 
   (binding [cache/*pandoc-cache* file-cache]
     (time
      (from-markdown "# Another header")))
+
+  (let [path (fs/expand-home "~/dev/iterate/mikrobloggeriet/o/olorm-1/index.md")]
+    (binding [cache/*pandoc-cache* file-cache]
+      (time
+       (from-markdown (slurp (str path))))))
+
+  (let [path (fs/expand-home "~/dev/teodorlu/play.teod.eu/journal/index.org")]
+    (binding [cache/*pandoc-cache* file-cache]
+      (time
+       (from-org (slurp (str path))))))
+  ;; first load: 227 ms
+  ;; second load: 37 ms
+
+  (let [path (fs/expand-home "~/dev/teodorlu/play.teod.eu/journal/index.org")]
+    (binding [cache/*pandoc-cache* in-mem-cache]
+      (time
+       (from-org (slurp (str path))))))
+  ;; first load: 197 ms
+  ;; second load: 6 ms
+  ;; third load: 8 ms
+  ;; fourth load: 6 ms
 
   )
 
