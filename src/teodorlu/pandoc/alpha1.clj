@@ -95,7 +95,9 @@
 
 (declare el->plaintext)
 
-(defn els->plaintext [els]
+(defn- els->plaintext
+  "Helper for el->plaintext"
+  [els]
   (str/join
    (->> els
         (map el->plaintext)
