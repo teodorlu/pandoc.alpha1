@@ -57,7 +57,8 @@
               cache-file (fs/file cache-dir (str digest ".edn"))]
           (spit cache-file (pr-str v))))
       (clear! [_]
-        nil))))
+        (fs/delete-tree cache-dir)
+        (fs/create-dirs cache-dir)))))
 
 (comment
   (let [cache (in-memory-cache)]
