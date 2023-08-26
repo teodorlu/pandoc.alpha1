@@ -1,4 +1,11 @@
 (ns teodorlu.pandoc.alpha1.cache
+  "Plugin in your own pandoc cache to speed things up!
+
+  Bind teodorlu.pandoc.alpha1.cache/*pandoc-cache* to something that satisfies
+  teodorlu.pandoc.alpha1.cache/ICache to avoid shelling out to Pandoc when
+  converting text we've converted before.
+
+  In-memory and file-based caches are provided."
   (:require
    [babashka.fs :as fs]
    [clojure.edn :as edn]
