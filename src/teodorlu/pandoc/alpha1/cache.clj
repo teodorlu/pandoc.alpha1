@@ -1,6 +1,10 @@
 (ns teodorlu.pandoc.alpha1.cache
   "Plug in in your own pandoc cache to speed things up!
 
+  This library shells out to Pandoc for each document conversion. On my system,
+  conversions typically take about 30 ms for very small documents, and 300 ms
+  for very large documents. Cache lookups, in comparison, take 1-10 ms.
+
   Bind teodorlu.pandoc.alpha1.cache/*pandoc-cache* to something that satisfies
   teodorlu.pandoc.alpha1.cache/ICache to avoid shelling out to Pandoc when
   converting text we've converted before.
