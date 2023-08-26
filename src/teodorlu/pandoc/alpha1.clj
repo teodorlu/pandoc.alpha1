@@ -3,7 +3,8 @@
    [babashka.process]
    [cheshire.core :as json]
    [clojure.string :as str]
-   [teodorlu.pandoc.alpha1.cache :as cache]))
+   [teodorlu.pandoc.alpha1.cache :as cache]
+   [babashka.fs :as fs]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; LOW LEVEL PANDOC WRAPPER
@@ -51,9 +52,11 @@
   (cache/save file-cache some-cache-key "a solution!")
   (cache/lookup file-cache some-cache-key)
 
+  (slurp (fs/expand-home "~/dev/iterate/mikrobloggeriet/o/olorm-1/index.md"))
+
   (binding [cache/*pandoc-cache* file-cache]
     (time
-     (from-markdown "# A header")))
+     (from-markdown "# Another header")))
 
   )
 
