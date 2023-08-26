@@ -1,8 +1,9 @@
 (ns teodorlu.pandoc.alpha1
   (:require
-   [clojure.string :as str]
    [babashka.process]
-   [cheshire.core :as json]))
+   [cheshire.core :as json]
+   [clojure.string :as str]
+   [teodorlu.pandoc.alpha1.cache :as cache]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; LOW LEVEL PANDOC WRAPPER
@@ -13,10 +14,31 @@
 (defn- to-json-str [x]
   (json/generate-string x))
 
-(defn- run-pandoc [stdin command]
+(defn- run-pandoc* [stdin command]
   (let [process-handle (deref (babashka.process/process {:in stdin :out :string} command))]
     (when (= 0 (:exit process-handle))
       (:out process-handle))))
+
+(defn- run-pandoc [stdin command]
+  (if-let [cache  cache/*pandoc-cache*]
+    (let [k (pr-str (sorted-map :stdin stdin :command command))]
+      (if (cache/contains-key? cache k)
+        (cache/lookup cache k)
+        (let [v (run-pandoc* stdin command)]
+          (cache/save cache k v)
+          v)))
+    (run-pandoc* stdin command)))
+
+(comment
+  (time
+   (from-markdown "# A header"))
+
+  (def my-cache (cache/in-memory-cache))
+
+  (binding [cache/*pandoc-cache* my-cache]
+    (time
+     (from-markdown "# A header"))
+    ))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; PANDOC IR HELPERS

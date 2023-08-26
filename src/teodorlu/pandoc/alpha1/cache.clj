@@ -21,7 +21,8 @@
       (save [_ key val]
         (swap! cache assoc key val)))))
 
-(let [cache (in-memory-cache)]
-  (save cache :key :value)
-  (contains-key? cache :key)
-  (lookup cache :key))
+(comment
+  (let [cache (in-memory-cache)]
+    (save cache :key :value)
+    (contains-key? cache :key)
+    (lookup cache :key)))
