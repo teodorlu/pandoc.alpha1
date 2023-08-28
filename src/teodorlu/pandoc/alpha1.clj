@@ -15,8 +15,27 @@
 (defn- to-json-str [x]
   (json/generate-string x))
 
+(def ^:dynamic *intercept-command*
+  "Optionally provide function to override low-level calls to Pandoc
+
+  The function receives a map with two keys- fn-var and args.
+
+  - `fn-var` is a reference to the function it wants to call
+  - `args` are its arguments.
+
+  For example, to provide logging, you could intercept with:
+
+  (fn [{fn-var args}]
+    (prn (list (symbol fn-var args)))
+    (apply fn-var args))
+  "
+  (fn [{:keys [fn-var args]}]
+    (apply fn-var args)))
+
 (defn- run-pandoc* [stdin command]
-  (let [process-handle (deref (babashka.process/process {:in stdin :out :string} command))]
+  (let [process-handle (deref
+                        (*intercept-command* {:fn-var #'babashka.process/process
+                                              :args [{:in stdin :out :string} command]}))]
     (when (= 0 (:exit process-handle))
       (:out process-handle))))
 
