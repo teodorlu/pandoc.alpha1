@@ -23,7 +23,7 @@
   - `fn-var` is a reference to the function it wants to call
   - `args` are its arguments.
 
-  For example, to provide logging, you could intercept with:
+  For example, to log low-level calls, you could intercept with:
 
   (fn [{fn-var args}]
     (prn (list (symbol fn-var args)))
